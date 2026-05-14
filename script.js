@@ -8,6 +8,9 @@ async function postSubmission(name, score) {
     return resp.json();
 }
 
+/**
+ * Fetches score data from the server and updates the DOM with the final score and submission list.
+ */
 async function loadScores() {
     const resp = await fetch('/scores');
     if (!resp.ok) return;
@@ -15,6 +18,10 @@ async function loadScores() {
     document.getElementById('finalScore').textContent = data.stats.finalScore.toFixed(2);
     const list = document.getElementById('submissions');
     list.innerHTML = '';
+
+    /**
+     * Renders a single submission item, represented by the parameter `s`, into the DOM list element. The submission's name, score, weight, and calculated result are displayed.
+     */
     data.submissions.forEach(s => {
         const li = document.createElement('li');
         li.textContent = `${s.name} — score: ${s.score} weight: ${s.weight} result: ${s.result.toFixed(2)}`;
@@ -22,6 +29,9 @@ async function loadScores() {
     });
 }
 
+/**
+ * Handles form submission, validating name and score before posting to the API and optionally reloading scores if the name is "Marcelino".
+ */
 document.getElementById('submit').addEventListener('click', async function () {
     const name = document.getElementById('name').value || '';
     const scoreVal = document.getElementById('score').value;

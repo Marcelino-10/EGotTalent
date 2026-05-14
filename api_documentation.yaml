@@ -1,0 +1,72 @@
+{
+  "yaml": "openapi: 3.0.3
+info:
+  title: API Documentation
+  description: Auto-generated API documentation
+  version: 1.0.0
+paths:
+  /:
+    get:
+      summary: Serves the index.html file
+      description: Serves the index.html file as a static response for the root endpoint.
+      operationId: serveIndexHtml
+      tags:
+      - Static
+      responses:
+        '200':
+          description: Index.html served successfully
+        '500':
+          description: Internal server error
+  /scores:
+    get:
+      summary: Retrieves recent submissions and aggregated scores
+      description: Fetches the 500 most recent submissions and calculates the aggregated
+        final score based on results and weights.
+      operationId: getScores
+      tags:
+      - Scores
+      responses:
+        '200':
+          description: Successfully retrieved scores and submissions.
+        '500':
+          description: Internal server error occurred.
+  /calcScore:
+    post:
+      summary: Calculates and saves a submission's score.
+      description: Receives a submission, calculates its weighted score, saves it
+        to MongoDB, and returns updated aggregated statistics.
+      operationId: calculateScore
+      tags:
+      - Score
+      responses:
+        '200':
+          description: Submission processed and stats updated.
+        '400':
+          description: 'Invalid input: missing name or score, or invalid score format.'
+        '500':
+          description: Internal server error during processing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              - score
+              properties:
+                name:
+                  type: string
+                  description: The name associated with the submission.
+                score:
+                  type: number
+                  description: The raw score for the submission.
+            example:
+              name: John Doe
+              score: 85.5
+tags:
+- name: Score
+- name: Scores
+- name: Static
+"
+}
