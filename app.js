@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express');  // Configures the Express application, sets up middleware for JSON and URL-encoded data parsing, serves static files, defines a Mongoose schema and model for submissions, and establishes API endpoints for calculating scores and retrieving aggregated results. It also handles MongoDB connection and server startup.
 const app = express();
 const mongoose = require('mongoose');
 const path = require('path');
@@ -22,12 +22,16 @@ const submissionSchema = new mongoose.Schema({
 
 const Submission = mongoose.model('Submission', submissionSchema);
 
-// Basic index route (serves index.html from static)
+/**
+ * Serves the 'index.html' file from the root directory when the application's root endpoint is accessed via a GET request.
+ */
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// POST /calcScore - receive a single submission, compute weight/result and save
+/**
+ * Handles POST requests to '/calcScore'. It validates incoming submission data (name and score), calculates a weighted score based on the name prefix ('MR' gives higher weight), saves the submission to MongoDB, and returns the newly saved submission along with aggregated statistics (total weighted score, total weight, and count) and a calculated final score.
+ */
 app.post('/calcScore', async (req, res) => {
   try {
     const nameRaw = (req.body.name || '').toString();
@@ -72,7 +76,9 @@ app.post('/calcScore', async (req, res) => {
   }
 });
 
-// GET /scores - return all submissions and aggregated final score
+/**
+ * Handles GET requests to '/scores'. It fetches the 500 most recent submissions from MongoDB, calculates aggregated statistics (total weighted score, total weight, and count) using MongoDB's aggregation framework, and returns both the recent submissions and the calculated final score.
+ */
 app.get('/scores', async (req, res) => {
   try {
     const submissions = await Submission.find().sort({ createdAt: -1 }).limit(500);
@@ -99,8 +105,16 @@ app.get('/scores', async (req, res) => {
 
 // Connect to MongoDB and start server
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+
+  /**
+   * This callback function is executed upon a successful connection to MongoDB. It logs a confirmation message and then starts the Express application's server, making it listen on the specified port.
+   */
   .then(() => {
     console.log('Connected to MongoDB');
+
+    /**
+     * This callback function is executed once the Express application begins listening on the specified port. It logs a message to the console indicating that the server is running and provides the URL where it can be accessed.
+     */
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
